@@ -1,45 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Books</title>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        table {
-            width: 100%;
-        }
-    </style>
-</head>
-<body>
-    
-    <h1>All Restaurants</h1>
-        
-        <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Cuisine</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each restaurant}}
+    <div class="container">
+        <h2>Restaurant Table</h2>
+        <table class="restaurant-table">
+            <thead>
                 <tr>
+                    <th>Restaurant Id</th>
+                    <th>Restaurant Name</th>
+                    <th>Cuisine</th>
+                    <th>Borough</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each data}}
+                <tr>
+                    <td>{{this.restaurant_id}}</td>
                     <td>{{this.name}}</td>
                     <td>{{this.cuisine}}</td>
+                    <td>{{this.borough}}</td>
                 </tr>
-            {{/each}}
-        </tbody>
-    </table>
-    
-</body>
-</html>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <a href="/api/restaurant/?page={{#previous page}}{{/previous}}&perPage={{perPage}}" class="relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0">Previous</a>
+            <a href="/api/restaurant/?page={{#next page}}{{/next}}&perPage={{perPage}}" class="relative ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0">Next</a>
+        </div>
+    </div>

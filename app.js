@@ -1,69 +1,76 @@
-const express = require('express');
-const app = express();
-const path = require('path');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const database = require('./config/database');
-const bodyParser = require('body-parser');
-const restaurantRouter = require('./routes/restaurantsRoute');
-const authRouter = require('./routes/authRoute');
+require('dotenv').config()
+const express = require("express");
+const path = require("path");
+const handlebars = require('express-handlebars');
+const mongoose = require("mongoose");
+const cookieParser = require('cookie-parser');
+const jwt=require('jsonwebtoken');
+// Set constant for port
+const PORT = process.env.PORT || 8000;
 
-const { check, validationResult } = require("express-validator");
+var restaurant_routes = require("./routes/routes");
 
-const port = process.env.PORT || 3000;
-dotenv.config();
-mongoose.connect(database.url);
+// Import Restaurant and User Mongoose schemas
+let Restaurant_Model = require("./models/restaurant");
+let User_Model = require('./models/user');
+
+
+// Verify JWT Token
+function matchToken(req,res,next){
+  if(req.cookies.jwt != null){
+      const bearer = req.cookies.jwt.split(' ')
+      const loginCredential = bearer[1]
+      req.token = loginCredential
+      next()
+  }
+  next()
+}
+
+
+// Connect to database
+
+let host=process.env.URL;
+let mydb=process.env.myDB;
+mongoose.connect(host+mydb)
+.then(() => console.log('Connected to MongoDB'))
+.catch((err) => console.error('Error connecting to MongoDB:', err));
 let db = mongoose.connection;
 
-// Check connection
-db.once("open", function () {
-  console.log("Connected to MongoDB");
-});
+// Initialize express app
+const app = express();
 
-// Check for DB errors
-db.on("error", function (err) {
-  console.log("DB Error");
-});
+// Initialize built-in middleware for urlencoding and json
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser())
+app.use(express.static("public"));
+app.engine('.hbs', handlebars.engine(
+    {
+        extname: '.hbs',
+        helpers: {
+            next: function(page) {
+                return parseInt(page)+1;
+            },
+            previous: function(page) {
+                console.log(page);
+                return parseInt(page)-1;
+            }
+        },
+    }
+));
+app.set('view engine', 'hbs');
+console.log(restaurant_routes);
+app.use("/api/restaurant", restaurant_routes);
 
-app.use(bodyParser.urlencoded({ 'extended': 'true' }));
-app.use(bodyParser.json());
-app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
-app.use(cors());
-var Restaurant = require('./models/restaurant');
-const exphbs = require('express-handlebars');
-app.use(express.static(path.join(__dirname, 'views')));
-app.engine('.hbs', exphbs.engine({ extname: '.hbs' }));
-app.set("view engine", ".hbs");
-
-app.use('/api/restaurants', restaurantRouter);
-app.use('/api/auth', authRouter);
-
-app.use('/', (req, res) => {
-  const page = parseInt(req.query.page);
-  const perPage = parseInt(req.query.perPage);
-  const borough = req.query.borough;
-
-//   if (isNaN(page) || isNaN(perPage) || (borough && typeof borough !== 'string')) {
-//     return res.status(400).send("Invalid query parameters");
-//   }
-    console.log("default")
-  const filter = borough ? { borough } : {};
-
-  Restaurant.find(filter)
-    .skip(page * perPage)
-    .limit(perPage)
-    .lean()
-    .then((restaurants) => {
-      //res.render("index", { restaurant: restaurants });
-      res.status(200).send(restaurants);
+app.use("/",matchToken,(req, res) => {
+    jwt.verify(req.token, process.env.SECRETKEY, (err, decoded)=> {
+        if (err)
+            res.render("login", { layout: 'auth' });
+        else{
+            console.log("Idhar kaise aayega");
+            res.redirect('/api/restaurant')
+        }
     })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send("Error fetching restaurants");
-    });
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+  });
+// Listen on a port
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

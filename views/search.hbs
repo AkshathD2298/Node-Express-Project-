@@ -1,0 +1,21 @@
+<div class="container">
+    <h2>Restaurant Search</h2>
+    <form id="searchForm" class="search-form" method="GET" action="/api/restaurant/">
+        <label for="restaurantId">Restaurant ID:</label>
+        <input type="text" id="restaurantId" name="restaurantId" placeholder="Enter Restaurant ID..."/>
+        <button type="submit" class="btn-search">Search</button>
+    </form>
+</div>
+
+<script>
+document.getElementById('searchForm').addEventListener('submit', function(event) {
+  event.preventDefault(); // Prevent the form from submitting
+  
+  const restId = document.getElementById('restaurantId').value;
+  const formAction = `/api/restaurant/${restId}`;
+  document.getElementById('searchForm').setAttribute('action', formAction);
+  
+  // Now you can submit the form
+  this.submit();
+});
+</script>

@@ -1,0 +1,27 @@
+<div class="container">
+        <h2>Edit Restaurant</h2>
+        <form id="editForm" class="edit-form" onsubmit="submitEditForm(event)">
+
+            <label for="restaurantId">Restaurant ID:</label>
+            <input type="text" id="restaurantId" name="restaurantId" value="{{data.restaurant_id}}">
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{data.name}}">
+
+            <label for="building">Building:</label>
+            <input type="text" id="building" name="building" value="{{data.address.building}}">
+            <label for="street">Street:</label>
+            <input type="text" id="street" name="street" value="{{data.address.street}}">
+            <label for="zipcode">Address:</label>
+            <input type="text" id="zipcode" name="zipcode" value="{{data.address.zipcode}}">
+            
+            <label for="cuisine">Cuisine:</label>
+            <input type="text" id="cuisine" name="cuisine" value="{{data.cuisine}}">
+
+            <input type="hidden" id="grades" name="grades" value="{{data.grade}}">
+
+
+            <button type="submit" class="btn-save">Save Changes</button>
+            <button type="button" onclick="deleteRestaurant()" class="btn-delete">Delete</button>
+        </form>
+    </div>
